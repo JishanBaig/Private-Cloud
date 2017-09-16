@@ -1,5 +1,3 @@
-## Welcome to the PrivateCloud wiki!
-
 ## # Implementing simplified IaaS model
 
 
