@@ -1,0 +1,33 @@
+cmake_minimum_required(VERSION 2.6)
+
+project (cluster CXX)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lcurl")
+set(CLUSTER_HEADERS cluster.h)
+
+set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(CLUSTER_CODEGEN_DIR "${PROJECT_BINARY_DIR}/codegen")
+
+PREPEND(CLUSTER_HEADERS_PATHS ${PROJECT_SOURCE_DIR} ${CLUSTER_HEADERS})
+
+CODEGEN_FILES(CLUSTER_CODEGEN_SOURCES ${CLUSTER_CODEGEN_DIR} ${CLUSTER_HEADERS})
+
+add_custom_command(OUTPUT ${CLUSTER_CODEGEN_SOURCES}
+    COMMAND ${NGREST_BIN_PATH}ngrestcg -i "${PROJECT_SOURCE_DIR}" -o ${CLUSTER_CODEGEN_DIR} -t service ${CLUSTER_HEADERS}
+    DEPENDS ${CLUSTER_HEADERS_PATHS}
+)
+
+file(GLOB CLUSTER_SOURCES ${PROJECT_SOURCE_DIR}/*.cpp)
+
+list(APPEND CLUSTER_SOURCES ${CLUSTER_CODEGEN_SOURCES})
+
+include_directories(${PROJECT_SOURCE_DIR} $ENV{NGREST_EXT_INCLUDES})
+
+add_library(cluster MODULE ${CLUSTER_SOURCES})
+
+set_target_properties(cluster PROPERTIES PREFIX "")
+set_target_properties(cluster PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SERVICES_DIR}"
+)
+set(CMAKE_SHARED_LINKER_FLAGS "-L/usr/local/lib/restclient-cpp.so ${CMAKE_SHARED_LINKER_FLAGS}")
+target_link_libraries(cluster ngrestutils ngrestcommon ngrestjson ngrestengine curl restclient-cpp $ENV{NGREST_EXT_LIBS})

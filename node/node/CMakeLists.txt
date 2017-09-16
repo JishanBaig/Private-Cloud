@@ -1,0 +1,32 @@
+cmake_minimum_required(VERSION 2.6)
+
+project (node CXX)
+
+set(NODE_HEADERS node.h)
+
+set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(NODE_CODEGEN_DIR "${PROJECT_BINARY_DIR}/codegen")
+
+PREPEND(NODE_HEADERS_PATHS ${PROJECT_SOURCE_DIR} ${NODE_HEADERS})
+
+CODEGEN_FILES(NODE_CODEGEN_SOURCES ${NODE_CODEGEN_DIR} ${NODE_HEADERS})
+
+add_custom_command(OUTPUT ${NODE_CODEGEN_SOURCES}
+    COMMAND ${NGREST_BIN_PATH}ngrestcg -i "${PROJECT_SOURCE_DIR}" -o ${NODE_CODEGEN_DIR} -t service ${NODE_HEADERS}
+    DEPENDS ${NODE_HEADERS_PATHS}
+)
+
+file(GLOB NODE_SOURCES ${PROJECT_SOURCE_DIR}/*.cpp)
+
+list(APPEND NODE_SOURCES ${NODE_CODEGEN_SOURCES})
+
+include_directories(${PROJECT_SOURCE_DIR} $ENV{NGREST_EXT_INCLUDES})
+
+add_library(node MODULE ${NODE_SOURCES})
+
+set_target_properties(node PROPERTIES PREFIX "")
+set_target_properties(node PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SERVICES_DIR}"
+)
+
+target_link_libraries(node ngrestutils ngrestcommon ngrestjson ngrestengine virt $ENV{NGREST_EXT_LIBS})

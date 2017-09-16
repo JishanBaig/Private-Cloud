@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<domain type='qemu' id='0'>
+  <name>centos10</name>
+  <uuid></uuid>
+  <memory>1024</memory>
+  <currentMemory>1024</currentMemory>
+  <vcpu>1</vcpu>
+  <os>
+    <type arch='i686' machine='pc'>hvm</type>
+  </os>
+  <devices>
+    <emulator>/usr/bin/qemu-system-x86_64</emulator>
+    <disk type='file' device='disk'>
+      <source file='/home/euc/Public/CentOS-7-x86_64-DVD-1511.iso'/>
+      <target dev='hda'/>
+    </disk>
+    <interface type='network'>
+      <source network='default'/>
+    </interface>
+    <graphics type='vnc'/>
+  </devices>
+</domain>
