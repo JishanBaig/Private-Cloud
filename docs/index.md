@@ -9,14 +9,14 @@
 ## What is IaaS?
 
 Our goal is to design and implement our own private cloud providing simplified IaaS to the clients.
-1. Client 
+### 1. Client 
 Client can request to create new virtual machines according to his own requirements. The requirements can be number of  virtual cpus , memory for the created virtual machines. Other initial configuration information to create the virtual machine can be used by default. Client can request to create virtual machines by name and later can also request to suspend, resume and destroy them by giving  virtual machine name and request type to cloud controller.
 
 
 ![](./Picture1.png)
 
 
-2. Cloud Controller
+### 2. Cloud Controller
 Cloud controller can get the request from client . it will process the received request and send commands to cluster controllers accordingly. Later cluster controllers can perform operations in their corresponding availability zones.
  
 Various functions in cloud controller-
@@ -39,7 +39,7 @@ After computing the source and the target for migration, cloud controller will a
 ![](./Picture2.png)
 
 
-3. Cluster Controller
+### 3. Cluster Controller
 Cluster controller will get the requests from the cloud controller and will operate in its availability zone. It will get the virtual machine requirements from the the cloud controller and will ask to all the node controllers that they can fulfill all the requirements of the cloud controller. If they are not sufficient then it will send error message to the cloud controller. If it can fulfill then it will run some scheduling algorithm to create the virtual machines in the nodes present in their corresponding availability zones. Cluster controller can able to run greedy, round robin and matchmaking algorithm to schedule the virtual machines. 
   
    	createVM :-  this function is used to command the node controller in the corresponding     availability zone for creating virtual machine by giving its name .
@@ -86,7 +86,7 @@ It will get the traffic information from apache web server running on virtual ma
 
 ![](./Picture6.png)
 
-4. Node controller
+### 4. Node controller
 Node controller is responsible for managing the virtual machines running on the node. It will keep the dynamic information about all the virtual machines running on the node. All the information about the virtual machines are provided by the node controller to the cluster controller and cloud controller whenever asked. It will keep an unordered map with key as the name of the virtual machine will will have the state, vcpus, memory, max memory info about the virtual machines.
 virNodeInfo
 struct virNodeInfo {
