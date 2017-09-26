@@ -1,15 +1,25 @@
-## # Implementing simplified IaaS model
+## What is Cloud?
 
+## What is Private Cloud?
+
+## What kind of services I can get as a cloud consumer?
+
+## What is IaaS, SaaS, PaaS?
+
+## What is IaaS?
 
 Our goal is to design and implement our own private cloud providing simplified IaaS to the clients.
+1. Client 
+Client can request to create new virtual machines according to his own requirements. The requirements can be number of  virtual cpus , memory for the created virtual machines. Other initial configuration information to create the virtual machine can be used by default. Client can request to create virtual machines by name and later can also request to suspend, resume and destroy them by giving  virtual machine name and request type to cloud controller.
+
 
 ![](https://github.com/JishanBaig/PrivateCloud/blob/master/docs/Picture1.png)
 
-1. Client 
-Client can request to create new virtual machines according to his own requirements. The requirements can be number of  virtual cpus , memory for the created virtual machines. Other initial configuration information to create the virtual machine can be used by default. Client can request to create virtual machines by name and later can also request to suspend, resume and destroy them by giving  virtual machine name and request type to cloud controller.
+
 2. Cloud Controller
 Cloud controller can get the request from client . it will process the received request and send commands to cluster controllers accordingly. Later cluster controllers can perform operations in their corresponding availability zones.
- Various functions in cloud controller-
+ 
+Various functions in cloud controller-
 1)	createVM :-  this function is used to command the cluster controller in the corresponding availability zone for creating virtual machine by giving its name .
 2)	createVMreq :-  in this function client can specify its requirements as number of virtual machines, number of cpus, memory size and availability zone for virtual machine creation.
 3)	suspendVM :- in this function the running virtual machine can be suspended by using its virDomain name.this request is forwarded to the corresponding availability zone in which the virtual machine is running.
@@ -25,7 +35,9 @@ Cloud controller can get the request from client . it will process the received 
 The volume_to_memory_ratio is stored for all the nodes inside volume_memory_ratios vector. then the vector is sorted in ascending order. The node with the highest volume_memory_ratio will be considered as target for the migrated virtual machines and the node with the lowest volume_memory_ratio will be considered as source to migrate virtual machines. The source having the lowest volume_memory_ratio will be the candidate for consolidation.
 After computing the source and the target for migration, cloud controller will ask for the busy resources in source and the available resources in target nodes .then it will check that all the busy resources can be make available by the migration to target node. If this condition is satisfied then cloud controller will send the target nodes’ uri to the source node by calling the function migrateVM. So that the source node can migrate all its virtual machines to the target node. After successful completion of the migration, source node can go into consolidate state.   
 
+
 ![](https://github.com/JishanBaig/PrivateCloud/blob/master/docs/Picture2.png)
+
 
 3. Cluster Controller
 Cluster controller will get the requests from the cloud controller and will operate in its availability zone. It will get the virtual machine requirements from the the cloud controller and will ask to all the node controllers that they can fulfill all the requirements of the cloud controller. If they are not sufficient then it will send error message to the cloud controller. If it can fulfill then it will run some scheduling algorithm to create the virtual machines in the nodes present in their corresponding availability zones. Cluster controller can able to run greedy, round robin and matchmaking algorithm to schedule the virtual machines. 
@@ -148,10 +160,13 @@ getbusyResources :- this function will return the busy resources at the node whe
 getResources :- this function will return all the resources at the node whenever it is requested by either cluster controller and cloud controller. all resources will contain number of all cpus, total memory size. 
 
 
+## What is SaaS?
 
-P2.  Implementation of Simplified SaaS
+## What is EBS?
 
-P2. [a] Simplified EBS
+## What is Object Storage Service?
+
+### Simplified EBS
 PROBLEM STATEMENT
 To provide an EBS like service to create and attach storage to any VM on the go. The created storage volume can then be used for other VMs as well.
 
@@ -261,7 +276,7 @@ Returns: result json format
 { “result” : “Failure” } for failure
 
 
-P2. [b] Object Storage Service
+### Object Storage Service
 PROBLEM STATEMENT
 To provide the objectstorage service to store objects like files on physical machines. For this we will be using the architecture from the part a of problem 2.
 
@@ -329,31 +344,3 @@ This method will return the content of file.
 -	filename - name of the file
 
 Response : Content of file
-P3.  Checkpoint and Recovery in Container
-Design
-Checkpointing
-The software uses ptrace() system call and /proc directory entries to get context of the process. 
-To start tracing a process following command is used:
-ptrace(PTRACE_ATTACH, traced_proc, NULL, NULL);
-Registers are read  with following system call.
-ptrace(PTRACE_GETREGS,traced_proc,NULL, &regs);
-Signal mask is stored with following system call.
-ptrace(PTRACE_GETSIGMASK,traced_proc,NULL,&mask);
-
-To dump to pages from the memory of the process, first we read /proc/[pid]/maps files and fetch virtual start address and permission information. Then we read actual content of the memory from /proc/[pid]/mem directory with the address read from maps files. We store binary data into code file. This data read size is in multiple of page size. We store starting address, number of pages mapped from that starting address, and permission bits to pagesmap file.
-Recovery
-To recover a process from its checkpoint data first we create a child process and trace it with 
-ptrace(PTRACE_ATTACH, traced_proc, NULL, NULL);
-Then from parent process we restore child’s registers  with following system call.
-ptrace(PTRACE_SETREGS,traced_proc,NULL, &regs);
-Signal mask is restored with following system call.
-ptrace(PTRACE_SETSIGMASK,traced_proc,NULL,&mask);
-
-Next to restore  memory of the process we first read pagesmap file to get start address, protection info bits and number of pages mapped to given starting address. Then we read code file in multiple of page size and use mmap() system call. After this step child will continue its execution.
-
-
-References
-[1] https://docs.eucalyptus.com/eucalyptus/4.3.0/install-guide/euca_architecture.html
-[2] Prajapati, Karan D., et al. "Comparison of virtual machine scheduling algorithms in cloud computing." International Journal of Computer Applications 83.15 (2013).
-[3] Nurmi, Daniel, et al. "The eucalyptus open-source cloud-computing system." Cluster Computing and the Grid, 2009. CCGRID'09. 9th IEEE/ACM International Symposium on. IEEE, 2009.
-
